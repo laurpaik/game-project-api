@@ -1,6 +1,6 @@
 #
 class Game < ActiveRecord::Base
-  include ListenNotify
+  include Notify
 
   notify_on_update
 
