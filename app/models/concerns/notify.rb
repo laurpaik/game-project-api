@@ -13,28 +13,32 @@ module Notify
     "#{self.class}::create"
   end
 
+  def before_destroy_notify_channel
+    "#{self.class}#destroy(#{id})"
+  end
+
   def notify_update
     root = self.class.to_s.downcase
-    # save the changes in a hash with the root as the key
     payload = { root => changes }.to_json
-    # tell postgres to run `notify`
-    # sends notification event to that channel defined earlier with the payload
     self.class.connection.execute(
       "NOTIFY \"#{on_update_notify_channel}\", '#{payload}'"
     )
   end
 
   def notify_create
-    connection.execute(
-      # notify the channel with the changes as the payload message
+    self.class.connection.execute(
       "NOTIFY \"#{on_create_notify_channel}\", '#{changes}'"
     )
   end
 
-  #
+  def notify_destroy
+    self.class.connection.execute(
+      "NOTIFY \"#{before_destroy_notify_channel}\", 'Destroying #{self.class}(#{id})'"
+    )
+  end
+
   module ClassMethods
     def notify_on_update
-      # after each update, run notify update --> this is what we call in model
       after_update :notify_update
     end
 
@@ -42,8 +46,8 @@ module Notify
       after_create :notify_create
     end
 
-    # def notify_before_destroy
-    #   before_action :destroy, :notify_destroy
-    # end
+    def notify_before_destroy
+      before_destroy :notify_destroy
+    end
   end
 end
