@@ -26,8 +26,12 @@ module Notify
   end
 
   def notify_create
+    root = self.class.to_s.downcase
+    changes_hash = {}
+    changes.each_pair { |key, val| changes_hash[key] = val.last }
+    payload = { root => changes_hash }.to_json
     self.class.connection.execute(
-      "NOTIFY \"#{on_create_notify_channel}\", '#{changes}'"
+      "NOTIFY \"#{on_create_notify_channel}\", '#{payload}'"
     )
   end
 
