@@ -1,5 +1,5 @@
-class ChannelsController < ApplicationController
-  before_action :set_channel, only: [:show, :update, :destroy]
+class ChannelsController < ProtectedController
+  before_action :set_channel, only: [:update, :destroy]
 
   # GET /channels
   # GET /channels.json
@@ -12,13 +12,13 @@ class ChannelsController < ApplicationController
   # GET /channels/1
   # GET /channels/1.json
   def show
-    render json: @channel
+    render json: current_user.channels.find(params[:id])
   end
 
   # POST /channels
   # POST /channels.json
   def create
-    @channel = Channel.new(channel_params)
+    @channel = current_user.channels.build(channel_params)
 
     if @channel.save
       render json: @channel, status: :created
@@ -30,8 +30,6 @@ class ChannelsController < ApplicationController
   # PATCH/PUT /channels/1
   # PATCH/PUT /channels/1.json
   def update
-    @channel = Channel.find(params[:id])
-
     if @channel.update(channel_params)
       head :no_content
     else
@@ -48,7 +46,7 @@ class ChannelsController < ApplicationController
   end
 
   def set_channel
-    @channel = Channel.find(params[:id])
+    @channel = Channel.find_by(id: params[:id], user: current_user)
   end
   private :set_channel
 
