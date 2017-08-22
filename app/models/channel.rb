@@ -5,6 +5,6 @@ class Channel < ActiveRecord::Base
   validates :name,
             presence: true,
             format: {
-              with: /([A-Z])\w+#(?=create$|update\(\d+\)$|destroy\(\d+\)$)/
+              with: /([A-Z])\w+(?=::create$|#update\(\d+\)$|#destroy\(\d+\)$)/
             }
 end
