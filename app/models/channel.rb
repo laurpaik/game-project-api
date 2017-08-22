@@ -2,5 +2,9 @@
 
 class Channel < ActiveRecord::Base
   belongs_to :user
-  validates :name, presence: true
+  validates :name,
+            presence: true,
+            format: {
+              with: /([A-Z])\w+#(?=create$|update\(\d+\)$|destroy\(\d+\)$)/
+            }
 end
