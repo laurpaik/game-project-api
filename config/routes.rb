@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :games, except: [:new, :edit, :destroy]
   # this is the streaming interface
   get '/games/:id/watch' => 'games#watch'
+  get '/channels/:id/watch' => 'listeners#watch'
 
   post '/sign-up' => 'users#signup'
   post '/sign-in' => 'users#signin'
