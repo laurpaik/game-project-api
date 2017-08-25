@@ -27,7 +27,7 @@ class ListenersController < ProtectedController
   end
 
   def handle_notify
-    @channel.listen_for_event(@timeout) do |_event, data|
+    @channel.listen_for_event(@timeout, @string) do |_event, data|
       @queue.push data
     end
     @queue.push timeout: 'watch timed out'
@@ -44,9 +44,12 @@ class ListenersController < ProtectedController
 
   def watch
     @queue = Queue.new
-    # didn't recognize current_user.id
+    # didn't recognize `current_user.id`
     @channel = Channel.where(user: current_user)
-    @timeout = params[:timeout] ? params[:timeout].to_i : 120
+    @timeout = params[:timeout] ? params[:timeout].to_i : 30 # FIXME this has to go back to 120 eventually
+    # OPTIMIZE this is all terrible, but it's doing what I expect, at least
+    channel_json = Channel.find(params[:id]).to_json # FIXME auth
+    @string = JSON.parse(channel_json)["name"]
     heartbeat = start_heartbeat
     notify = start_notify
     response.headers['Content-Type'] = 'text/event-stream'
