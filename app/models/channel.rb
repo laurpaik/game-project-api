@@ -1,17 +1,22 @@
 # frozen_string_literal: true
 
+class ResourceValidator < ActiveModel::Validator
+  def validate(record)
+    class_name = record.name.split(/[^a-zA-Z0-9]/)[0]
+    if !Object.const_get class_name
+      record.errors[:base] << 'Resource needs to exist'
+    end
+  end
+end
+
 class Channel < ActiveRecord::Base
   belongs_to :user
+  validates_with ResourceValidator
   validates :name,
             presence: true,
             format: {
               with: /([A-Z])\w+(?=::create$|#update\(\d+\)$|#destroy\(\d+\)$)/
             }
-
-  # FIXME: this would parse the string in each Channel instance for the model name needed, but it's in the wrong file
-  # def connection_class # think of a better name
-  #   constantize(channel_name.split(/[^a-zA-Z0-9]/)[0])
-  # end
 
   def self.listen_for_event(timeout, string)
     # connection = connection_class.connection
