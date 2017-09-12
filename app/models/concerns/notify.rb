@@ -13,7 +13,7 @@ module Notify
     "#{self.class}::create"
   end
 
-  def before_destroy_notify_channel
+  def on_destroy_notify_channel
     "#{self.class}#destroy(#{id})"
   end
 
@@ -37,7 +37,7 @@ module Notify
 
   def notify_destroy
     self.class.connection.execute(
-      "NOTIFY \"#{before_destroy_notify_channel}\", 'Destroying #{self.class}(#{id})'"
+      "NOTIFY \"#{on_destroy_notify_channel}\", 'Destroying #{self.class}(#{id})'"
     )
   end
 
@@ -50,7 +50,7 @@ module Notify
       after_create :notify_create
     end
 
-    def notify_before_destroy
+    def notify_on_destroy
       before_destroy :notify_destroy
     end
   end

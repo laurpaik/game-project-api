@@ -4,7 +4,7 @@ class Game < ActiveRecord::Base
 
   notify_on_update
   notify_on_create
-  notify_before_destroy
+  notify_on_destroy
 
   belongs_to :player_x, class_name: 'User'
   belongs_to :player_o, class_name: 'User'
