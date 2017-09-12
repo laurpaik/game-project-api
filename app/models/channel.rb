@@ -3,7 +3,9 @@
 class ResourceValidator < ActiveModel::Validator
   def validate(record)
     class_name = record.name.split(/[^a-zA-Z0-9]/)[0]
-    if !Object.const_get class_name
+    begin
+      Object.const_get class_name
+    rescue
       record.errors[:base] << 'Resource needs to exist'
     end
   end
