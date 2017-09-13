@@ -4,7 +4,7 @@ class ChannelsController < ProtectedController
   # GET /channels
   # GET /channels.json
   def index
-    @channels = Channel.all
+    @channels = current_user.channels.all
 
     render json: @channels
   end
