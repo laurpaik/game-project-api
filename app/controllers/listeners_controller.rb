@@ -13,8 +13,7 @@ class ListenersController < ProtectedController
     head :unauthorized unless current_user
   end
 
-  # FIXME this needs to go back to 30 seconds at some point... changed it to 10 for time reasons
-  HEARTBEAT = 10
+  HEARTBEAT = 30
 
   def start_heartbeat
     Thread.new do
@@ -49,7 +48,7 @@ class ListenersController < ProtectedController
   def watch
     @queue = Queue.new
     @channels = Channel.where(user_id: current_user.id)
-    @timeout = params[:timeout] ? params[:timeout].to_i : 30 # FIXME this has to go back to 120 eventually
+    @timeout = params[:timeout] ? params[:timeout].to_i : 120
     heartbeat = start_heartbeat
     notify = start_notify
     response.headers['Content-Type'] = 'text/event-stream'
